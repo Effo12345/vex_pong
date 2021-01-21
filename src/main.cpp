@@ -11,6 +11,7 @@
 // Robot Configuration:
 // [Name]               [Type]        [Port(s)]
 // Controller1          controller                    
+// Controller2          controller                    
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
@@ -35,7 +36,7 @@ bool isGameRunning = true;
 int oldPlayerY = 80;
 int newPlayerY;
 
-int oldAIY = 131;
+int oldAIY = 80;
 int newAIY;
 
 int centerLineY = 0;
@@ -53,6 +54,8 @@ int timesRun = 0;
 
 int rightScore = 0;
 int leftScore = 0;
+
+color ballColor = white;
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -85,11 +88,13 @@ void ResetGame()
   Brain.Screen.drawRectangle(newBallX, newBallY, 10, 10);
 
 
-  Brain.Screen.setPenColor(white);
-  Brain.Screen.setFillColor(white);
+  Brain.Screen.setPenColor(blue);
+  Brain.Screen.setFillColor(blue);
   Brain.Screen.drawRectangle(0, 80, 15, 80);
 
-  Brain.Screen.drawRectangle(465, oldAIY, 15, 80);
+  Brain.Screen.setPenColor(red);
+  Brain.Screen.setFillColor(red);
+  Brain.Screen.drawRectangle(465, 80, 15, 80);
 
   DrawCenterLine();
 
@@ -100,9 +105,12 @@ void ResetGame()
   oldBallY = 131;
 
   oldPlayerY = 80;
+  oldAIY = 80;
 
   ballVelocityX = -5;
   ballVelocityY = -5;
+
+  ballColor = white;
 
   UpdateScore();
 
@@ -114,9 +122,9 @@ void ResetGame()
     Brain.Screen.setFillColor(black);
     Brain.Screen.drawRectangle(0, 0, 480, 272);
 
-    Brain.Screen.setPenColor(white);
+    Brain.Screen.setPenColor(blue);
     Brain.Screen.setCursor(6, 20);
-    Brain.Screen.print("You win");
+    Brain.Screen.print("Left wins");
   }
   else if(leftScore == 10)
   {
@@ -126,9 +134,9 @@ void ResetGame()
     Brain.Screen.setFillColor(black);
     Brain.Screen.drawRectangle(0, 0, 480, 272);
 
-    Brain.Screen.setPenColor(white);
+    Brain.Screen.setPenColor(red);
     Brain.Screen.setCursor(6, 20);
-    Brain.Screen.print("You lose");
+    Brain.Screen.print("Right wins");
   }
 }
 
@@ -158,8 +166,8 @@ void MovePlayer()
     Brain.Screen.setFillColor(black);
     Brain.Screen.drawRectangle(0, oldPlayerY, 15, 80);
 
-    Brain.Screen.setPenColor(white);
-    Brain.Screen.setFillColor(white);
+    Brain.Screen.setPenColor(blue);
+    Brain.Screen.setFillColor(blue);
     Brain.Screen.drawRectangle(0, newPlayerY, 15, 80);
 
     oldPlayerY = newPlayerY;
@@ -172,8 +180,8 @@ void MovePlayer()
     Brain.Screen.setFillColor(black);
     Brain.Screen.drawRectangle(0, oldPlayerY, 15, 80);
 
-    Brain.Screen.setPenColor(white);
-    Brain.Screen.setFillColor(white);
+    Brain.Screen.setPenColor(blue);
+    Brain.Screen.setFillColor(blue);
     Brain.Screen.drawRectangle(0, newPlayerY, 15, 80);
 
     oldPlayerY = newPlayerY;
@@ -186,20 +194,37 @@ void MovePlayer()
 
 void MoveAI()
 {
-  if((oldBallY < 200) && (oldBallY > 40))
+  if((Controller2.Axis3.position() > 20) && oldAIY > 0)
   {
-    newAIY += (oldBallY - oldAIY);
-    newAIY -= 40;
+    newAIY = oldAIY - 7;
 
     Brain.Screen.setPenColor(black);
     Brain.Screen.setFillColor(black);
     Brain.Screen.drawRectangle(465, oldAIY, 15, 80);
 
-    Brain.Screen.setPenColor(white);
-    Brain.Screen.setFillColor(white);
+    Brain.Screen.setPenColor(red);
+    Brain.Screen.setFillColor(red);
     Brain.Screen.drawRectangle(465, newAIY, 15, 80);
 
     oldAIY = newAIY;
+  }
+  else if((Controller2.Axis3.position() < -20) && oldAIY < 160)
+  {
+    newAIY = oldAIY + 7;
+
+    Brain.Screen.setPenColor(black);
+    Brain.Screen.setFillColor(black);
+    Brain.Screen.drawRectangle(465, oldAIY, 15, 80);
+
+    Brain.Screen.setPenColor(red);
+    Brain.Screen.setFillColor(red);
+    Brain.Screen.drawRectangle(465, newAIY, 15, 80);
+
+    oldAIY = newAIY;
+  }
+  else
+  {
+    newAIY = oldAIY;
   }
 }
 
@@ -212,8 +237,8 @@ void MoveBall()
   Brain.Screen.setFillColor(black);
   Brain.Screen.drawRectangle(oldBallX, oldBallY, 10, 10);
 
-  Brain.Screen.setPenColor(white);
-  Brain.Screen.setFillColor(white);
+  Brain.Screen.setPenColor(ballColor);
+  Brain.Screen.setFillColor(ballColor);
   Brain.Screen.drawRectangle(newBallX, newBallY, 10, 10);
 
   oldBallX = newBallX;
@@ -224,12 +249,10 @@ void WallReverseVelocity()
 {
   if(oldBallY <= 0)
   {
-    //ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
   }
   else if((oldBallY + 10) >= 240)
   {
-    //ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
   }
 }
@@ -239,16 +262,22 @@ void PlayerReverseVelocity()
   if((oldBallX <= 15) && (oldBallY >= newPlayerY) && (oldBallY <= (oldPlayerY +80)))
   {
     ballVelocityX = -ballVelocityX;
+
+    ballColor = blue;
   }
   else if((oldBallX <= 15) && (oldBallY == (oldPlayerY -10)))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
+
+    ballColor = blue;
   }
   else if((oldBallX <= 15) && (oldBallY == (oldPlayerY +80)))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
+
+    ballColor = blue;
   }
 }
 
@@ -257,16 +286,22 @@ void AIReverseVelocity()
   if((oldBallX >= 455) && (oldBallY >= newAIY) && (oldBallY <= (oldAIY +80)))
   {
     ballVelocityX = -ballVelocityX;
+
+    ballColor = red;
   }
   else if((oldBallX >= 455) && (oldBallY == (oldAIY -10)))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
+
+    ballColor = red;
   }
   else if((oldBallX >= 455) && (oldBallY == (oldAIY +80)))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
+
+    ballColor = red;
   }
 }
 
