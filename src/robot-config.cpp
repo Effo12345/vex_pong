@@ -9,7 +9,6 @@ brain  Brain;
 
 // VEXcode device constructors
 controller Controller1 = controller(primary);
-controller Controller2 = controller(partner);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

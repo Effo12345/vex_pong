@@ -240,12 +240,12 @@ void PlayerReverseVelocity()
   {
     ballVelocityX = -ballVelocityX;
   }
-  else if((oldBallX <= 15) && (oldBallY == (oldPlayerY -10)))
+  else if((oldBallX <= 15) && (((oldPlayerY -10) - oldBallY) < 1) && (oldBallY <= (oldPlayerY +80)))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
   }
-  else if((oldBallX <= 15) && (oldBallY == (oldPlayerY +80)))
+  else if((oldBallX <= 15) && (oldBallY - (oldPlayerY +90) < 2) && (oldBallY >= oldPlayerY))
   {
     ballVelocityX = -ballVelocityX;
     ballVelocityY = -ballVelocityY;
