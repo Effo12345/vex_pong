@@ -29,6 +29,8 @@ void PlayerReverseVelocity();
 void TestOutOfBounds();
 void UpdateScore();
 
+void RandomizeVelocity();
+
 //List all used variables
 bool isGameRunning = true;
 
@@ -53,6 +55,8 @@ int timesRun = 0;
 
 int rightScore = 0;
 int leftScore = 0;
+
+int oldBrainTime = Brain.Timer.value();
 
 int main() {
   // Initializing Robot Configuration. DO NOT REMOVE!
@@ -292,4 +296,33 @@ void UpdateScore()
 
   Brain.Screen.setCursor(1, 26);
   Brain.Screen.print(leftScore);
+}
+
+void RandomizeVelocity()
+{
+  if(ballVelocityY < 0)
+  {
+    ballVelocityY = -2;
+    ballVelocityY += (Controller1.Axis3.position(percent) / 17);
+  }
+  else if(ballVelocityY > 0)
+  {
+    ballVelocityY = 2;
+    ballVelocityY += (Controller1.Axis3.position(percent) / 17);
+  }
+
+  int newBrainTime = Brain.Timer.value();
+
+  if((newBrainTime - oldBrainTime) > 0)
+  {
+    oldBrainTime = Brain.Timer.value();
+    if(ballVelocityX < 0)
+    {
+      ballVelocityX -= .1;
+    }
+    else
+    {
+      ballVelocityX += .1;
+    }
+  }
 }
